@@ -9,6 +9,8 @@ import {
   PieChartOutlined,
   RightOutlined,
   TeamOutlined,
+  UsergroupAddOutlined,
+  UserSwitchOutlined,
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import { Layout, Menu } from 'antd';
@@ -16,6 +18,7 @@ import clsx from 'clsx';
 import React, { useEffect, useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import FooterMainLayout from '../components/page/common/Footer';
+import HeaderMainLayout from '../components/page/common/Header';
 
 const { Header, Sider } = Layout;
 
@@ -23,9 +26,18 @@ type MenuItem = Required<MenuProps>['items'][number];
 
 const items: MenuItem[] = [
   { key: '/', icon: <PieChartOutlined />, label: <Link to='/'>Dashboard</Link> },
-  { key: '/product', icon: <DesktopOutlined />, label: <Link to='/product'>Product</Link> },
+
+  {
+    key: '/user',
+    icon: <TeamOutlined />,
+    label: 'Users',
+    children: [
+      { key: '/staff', label: <Link to='/staff'>Staff</Link>, icon: <UsergroupAddOutlined /> },
+      { key: '/role', label: <Link to='/role'>Role</Link>, icon: <UserSwitchOutlined /> },
+    ],
+  },
+  { key: '/product2', icon: <DesktopOutlined />, label: <Link to='/product'>Product</Link> },
   { key: '/calendar', icon: <ContainerOutlined />, label: <Link to='/calendar'>Calendar</Link> },
-  { key: '/staff', icon: <TeamOutlined />, label: <Link to='/staff'>Staff</Link> },
   { key: '/123', icon: <ContainerOutlined />, label: <Link to='/produ123ct'>Not found</Link> },
   {
     key: 'sub1',
@@ -99,9 +111,9 @@ const MainLayout: React.FC = () => {
         collapsible
         collapsed={collapsed}
         onCollapse={setCollapsed}
-        className='fixed left-0 top-0 z-50 h-full overflow-y-auto bg-white transition-all !duration-200 ease-in-out'
+        className='fixed left-0 top-0 z-50 h-full overflow-y-auto border-r bg-white transition-all !duration-200 ease-in-out'
         trigger={
-          <div className='flex h-12 items-center justify-center !bg-[#8550FB] hover:bg-gray-200'>
+          <div className='flex h-12 items-center justify-center !bg-[#E2273950] hover:bg-gray-200'>
             {collapsed ? <RightOutlined /> : <LeftOutlined />}
           </div>
         }
@@ -137,10 +149,7 @@ const MainLayout: React.FC = () => {
         }}
       >
         {/* Fixed Header */}
-        <Header className='sticky top-0 z-40 flex h-16 items-center justify-between bg-gray-100 px-4 shadow-md'>
-          <div>Header Left</div>
-          <div>Header Right</div>
-        </Header>
+        <HeaderMainLayout />
 
         {/* Scrollable Content */}
         <div className='flex-1 overflow-y-auto overflow-x-hidden bg-white p-5'>

@@ -7,7 +7,7 @@ import { AppRouter } from './routes/appRouters';
 function App() {
   useEffect(() => {
     localStorage.setItem('token', 'fake_token');
-    localStorage.setItem('role', 'staff');
+    localStorage.setItem('role', 'admin');
   }, []);
 
   return (
