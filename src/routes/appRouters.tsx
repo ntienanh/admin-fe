@@ -1,6 +1,8 @@
 import { Route, Routes } from 'react-router-dom';
 import RequireRole from '../components/RequireRole';
 import MainLayout from '../layouts/MainLayout';
+import NotFoundPage from '../pages/NotFoundPage';
+import UnauthorizedPage from '../pages/UnauthorizedPage';
 import { adminRoutes } from './adminRoutes';
 
 export const AppRouter = () => {
@@ -11,8 +13,8 @@ export const AppRouter = () => {
           <Route key={path} path={path} element={<RequireRole allowed={allowedRoles}>{element}</RequireRole>} />
         ))}
 
-        <Route path='/unauthorized' element={<div>403 - Unauthorized</div>} />
-        <Route path='*' element={<div>404 - Not Found</div>} />
+        <Route path='/unauthorized' element={<UnauthorizedPage />} />
+        <Route path='*' element={<NotFoundPage />} />
       </Route>
     </Routes>
   );

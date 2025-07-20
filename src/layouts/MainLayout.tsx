@@ -1,30 +1,38 @@
 import {
   AppstoreOutlined,
+  AuditOutlined,
   ContainerOutlined,
   DesktopOutlined,
+  DollarOutlined,
+  LeftOutlined,
   MailOutlined,
   PieChartOutlined,
+  RightOutlined,
+  TeamOutlined,
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
-import { Layout, Menu, theme } from 'antd';
+import { Layout, Menu } from 'antd';
 import clsx from 'clsx';
-import React, { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, Outlet, useLocation } from 'react-router-dom';
 import FooterMainLayout from '../components/page/common/Footer';
 
-const { Header, Sider, Content } = Layout;
+const { Header, Sider } = Layout;
 
 type MenuItem = Required<MenuProps>['items'][number];
+
 const items: MenuItem[] = [
-  { key: '1', icon: <PieChartOutlined />, label: 'Option 1' },
-  { key: '2', icon: <DesktopOutlined />, label: 'Option 2' },
-  { key: '3', icon: <ContainerOutlined />, label: 'Option 3' },
+  { key: '/', icon: <PieChartOutlined />, label: <Link to='/'>Dashboard</Link> },
+  { key: '/product', icon: <DesktopOutlined />, label: <Link to='/product'>Product</Link> },
+  { key: '/calendar', icon: <ContainerOutlined />, label: <Link to='/calendar'>Calendar</Link> },
+  { key: '/staff', icon: <TeamOutlined />, label: <Link to='/staff'>Staff</Link> },
+  { key: '/123', icon: <ContainerOutlined />, label: <Link to='/produ123ct'>Not found</Link> },
   {
     key: 'sub1',
     label: 'Navigation One',
     icon: <MailOutlined />,
     children: [
-      { key: '5', label: 'Option 5' },
+      { key: '/product', label: 'Option 5' },
       { key: '6', label: 'Option 6' },
       { key: '7', label: 'Option 7' },
       { key: '8', label: 'Option 8' },
@@ -32,36 +40,20 @@ const items: MenuItem[] = [
   },
   {
     key: 'sub2',
-    label: 'Navigation Two',
+    label: 'Store',
     icon: <AppstoreOutlined />,
     children: [
-      { key: '9', label: 'Option 9' },
-      { key: '10', label: 'Option 10' },
-      {
-        key: 'sub3',
-        label: 'Submenu',
-        children: [
-          { key: '11', label: 'Option 11' },
-          { key: '12', label: 'Option 12' },
-        ],
-      },
+      { key: '9', label: 'History', icon: <DesktopOutlined /> },
+      { key: '10', label: 'Revenue', icon: <DollarOutlined /> },
     ],
   },
   {
-    key: 'sub4',
-    label: 'Navigation Three',
-    icon: <AppstoreOutlined />,
+    key: 'admin',
+    label: 'Administration',
+    icon: <AuditOutlined />,
     children: [
-      { key: '13', label: 'Option 13' },
-      { key: '14', label: 'Option 14' },
-      {
-        key: 'sub5',
-        label: 'Submenu',
-        children: [
-          { key: '15', label: 'Option 15' },
-          { key: '16', label: 'Option 16' },
-        ],
-      },
+      { key: '11', label: 'Settings', icon: <DesktopOutlined /> },
+      { key: '12', label: 'Revenue', icon: <DollarOutlined /> },
     ],
   },
 ];
@@ -69,15 +61,32 @@ const items: MenuItem[] = [
 const MainLayout: React.FC = () => {
   const [openKeys, setOpenKeys] = useState<string[]>([]);
   const [collapsed, setCollapsed] = useState(false);
+  const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
+  const location = useLocation();
+
+  useEffect(() => {
+    // Xác định menu nào nên mở dựa trên path
+    const path = location.pathname;
+    setSelectedKeys([path]);
+
+    // Tìm menu cha chứa path hiện tại
+    const findOpenKey = (items: any[], path: string): string[] => {
+      for (let item of items) {
+        if (item.children) {
+          const match = item.children.find((child: any) => child.key === path);
+          if (match) return [item.key];
+        }
+      }
+      return [];
+    };
+
+    setOpenKeys(findOpenKey(items, path));
+  }, [location.pathname]);
 
   const handleOpenChange = (keys: string[]) => {
     const latestOpenKey = keys.find(key => !openKeys.includes(key));
     setOpenKeys(latestOpenKey ? [latestOpenKey] : []);
   };
-
-  const {
-    token: { colorBgContainer },
-  } = theme.useToken();
 
   const sidebarWidth = collapsed ? 80 : 240;
 
@@ -90,12 +99,17 @@ const MainLayout: React.FC = () => {
         collapsible
         collapsed={collapsed}
         onCollapse={setCollapsed}
-        className='fixed left-0 top-0 z-50 h-full overflow-y-auto bg-white transition-all duration-300 ease-in-out'
+        className='fixed left-0 top-0 z-50 h-full overflow-y-auto bg-white transition-all !duration-200 ease-in-out'
+        trigger={
+          <div className='flex h-12 items-center justify-center !bg-[#8550FB] hover:bg-gray-200'>
+            {collapsed ? <RightOutlined /> : <LeftOutlined />}
+          </div>
+        }
       >
         {/* Logo */}
         <div
           className={clsx(
-            'flex h-16 w-full items-center justify-center border-r bg-white shadow-md',
+            'flex h-16 w-full items-center justify-center border-r bg-gray-100 shadow-md',
             collapsed && 'px-1',
           )}
         >
@@ -107,6 +121,7 @@ const MainLayout: React.FC = () => {
           theme='light'
           mode='inline'
           openKeys={openKeys}
+          selectedKeys={selectedKeys}
           defaultSelectedKeys={['1']}
           items={items}
           className='mt-2'
@@ -115,20 +130,20 @@ const MainLayout: React.FC = () => {
 
       {/* Main Content Area */}
       <div
-        className='flex h-full flex-col transition-[margin,width] duration-300 ease-in-out'
+        className='flex h-full flex-col transition-[margin,width] duration-200 ease-in-out'
         style={{
           marginLeft: sidebarWidth,
           width: `calc(100vw - ${sidebarWidth}px)`,
         }}
       >
         {/* Fixed Header */}
-        <Header className='sticky top-0 z-40 flex h-16 items-center justify-between bg-red-100 px-4 shadow-md'>
+        <Header className='sticky top-0 z-40 flex h-16 items-center justify-between bg-gray-100 px-4 shadow-md'>
           <div>Header Left</div>
           <div>Header Right</div>
         </Header>
 
         {/* Scrollable Content */}
-        <div className='flex-1 overflow-y-auto overflow-x-hidden bg-white'>
+        <div className='flex-1 overflow-y-auto overflow-x-hidden bg-white p-5'>
           <Outlet />
         </div>
 
