@@ -2,11 +2,11 @@ import {
   AppstoreOutlined,
   AuditOutlined,
   ContainerOutlined,
+  DashboardOutlined,
   DesktopOutlined,
   DollarOutlined,
   LeftOutlined,
   MailOutlined,
-  PieChartOutlined,
   RightOutlined,
   TeamOutlined,
   UsergroupAddOutlined,
@@ -17,15 +17,14 @@ import { Layout, Menu } from 'antd';
 import clsx from 'clsx';
 import React, { useEffect, useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
-import FooterMainLayout from '../components/page/common/Footer';
 import HeaderMainLayout from '../components/page/common/Header';
 
-const { Header, Sider } = Layout;
+const { Sider } = Layout;
 
 type MenuItem = Required<MenuProps>['items'][number];
 
 const items: MenuItem[] = [
-  { key: '/', icon: <PieChartOutlined />, label: <Link to='/'>Dashboard</Link> },
+  { key: '/', icon: <DashboardOutlined />, label: <Link to='/'>Dashboard</Link> },
 
   {
     key: '/user',
@@ -157,9 +156,9 @@ const MainLayout: React.FC = () => {
         </div>
 
         {/* Footer */}
-        <div className='bg-gray-100'>
+        {/* <div className='bg-gray-100'>
           <FooterMainLayout />
-        </div>
+        </div> */}
       </div>
     </div>
   );

@@ -2,6 +2,7 @@ import { useQuery, type QueryKey } from '@tanstack/react-query';
 import type { TablePaginationConfig, TableProps } from 'antd';
 import type { FilterValue, SorterResult } from 'antd/es/table/interface';
 import { useCallback, useMemo, useState } from 'react';
+import { cleanObject } from '../utils/common';
 
 // Kết quả API dạng chuẩn: items + total
 export interface ApiResponse<T> {
@@ -36,18 +37,22 @@ export function useAntdTable<T>({
 
   // Filters: dùng cho cột filter
   const [filters, setFilters] = useState<Record<string, FilterValue | null>>({});
+  // External filters: dùng search Input
+  const [searchInputFilters, setSearchInputFilters] = useState<Record<string, any>>({});
 
-  // Tổng params gửi đi
   const params = useMemo(() => {
-    return {
+    const rawParams = {
       page: pagination.current,
       limit: pagination.pageSize,
       sortField: sorter.field,
       sortOrder: sorter.order,
       ...filters,
       ...defaultParams,
+      ...searchInputFilters,
     };
-  }, [pagination, sorter, filters, defaultParams]);
+
+    return cleanObject(rawParams);
+  }, [pagination, sorter, filters, defaultParams, searchInputFilters]);
 
   const { data, isLoading, isFetching, refetch } = useQuery<ApiResponse<T>>({
     queryKey: [...queryKey, params],
@@ -80,6 +85,7 @@ export function useAntdTable<T>({
     total: data?.total ?? 0,
     loading: isLoading || isFetching,
     refetch,
+    setSearchInputFilters,
     tableProps: {
       dataSource: data?.data ?? [],
       loading: isLoading || isFetching,

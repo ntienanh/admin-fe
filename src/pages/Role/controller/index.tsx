@@ -1,6 +1,7 @@
 import type { ModalProps } from 'antd';
 import { Button, Form, Input, Modal } from 'antd';
 import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
+import type { IRole } from '../../../interfaces/role';
 
 interface I_Props extends ModalProps {
   onSubmitSuccess?: () => void;
@@ -9,7 +10,7 @@ interface I_Props extends ModalProps {
 }
 
 export interface I_RoleController {
-  openDetail: (id: string, editable: boolean, data?: { name: string; description: string }) => void;
+  openDetail: (id: string, editable: boolean, data?: IRole) => void;
   openCreate: () => void;
   close: () => void;
 }
@@ -26,16 +27,14 @@ const RoleController = forwardRef<I_RoleController, I_Props>((props, ref) => {
     form.resetFields();
   };
 
-  const openDetail = (id: string, canEdit: boolean, data?: { name: string; description: string }) => {
+  const openDetail = (id: string, canEdit: boolean, data?: IRole) => {
+    console.log('data', data);
+
     setOpen(true);
     setEditable(canEdit);
     roleId.current = id;
 
-    // TODO: fetch detail data and set to form if needed
-    form.setFieldsValue({
-      name: data?.name,
-      description: data?.description,
-    });
+    form.setFieldsValue({ ...data });
   };
 
   const close = () => {
@@ -59,13 +58,15 @@ const RoleController = forwardRef<I_RoleController, I_Props>((props, ref) => {
       <Form
         form={form}
         layout='vertical'
-        onFinish={values => {
-          // Gửi dữ liệu tạo/cập nhật ở đây
-          console.log('Form submitted:', values);
+        onFinish={() => {
           onSubmitSuccess?.();
           close();
         }}
       >
+        <Form.Item name='id' noStyle>
+          <Input type='hidden' />
+        </Form.Item>
+
         <Form.Item label='Role Name' name='name' rules={[{ required: true, message: 'Please input the role name!' }]}>
           <Input disabled={!editable} placeholder='Enter role name' />
         </Form.Item>
