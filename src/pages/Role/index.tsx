@@ -3,7 +3,8 @@ import { Button, Form, Table } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useRef } from 'react';
 import DeleteConfirm from '../../components/delete-confirm';
-import SearchInput from '../../components/SearchInput';
+import SearchInput from '../../components/search-input';
+import SortByDropdown, { type SortByDropdownRef } from '../../components/sort-by';
 import { EntityConfigs } from '../../config/entities';
 import { useRoleServices } from '../../hooks/features/useRoleServices';
 import { useAntdTable } from '../../hooks/useAntdTable';
@@ -12,12 +13,13 @@ import { RoleServices } from '../../services/role';
 import RoleController, { type I_RoleController } from './controller';
 
 const RolePage = () => {
+  const sortRef = useRef<SortByDropdownRef>(null);
   const [form] = Form.useForm();
   const entityConfig = EntityConfigs['roles'];
   const roleController = useRef<I_RoleController>(null);
   const { createMutation, deleteMutation, editMutation } = useRoleServices();
 
-  const { tableProps, setSearchInputFilters, loading } = useAntdTable<IRole>({
+  const { tableProps, setSearchInputFilters, loading, isFetching } = useAntdTable<IRole>({
     queryKey: ['roles'],
     apiFn: RoleServices.roleQuery,
   });
@@ -66,12 +68,30 @@ const RolePage = () => {
     roleController.current?.close();
   };
 
+  const handleSortChange = (key: string) => {
+    const [field, order] = key.split('_');
+
+    setSearchInputFilters(prev => ({
+      ...prev,
+      sortBy: field,
+      order,
+    }));
+  };
+
   return (
     <div className='flex flex-col gap-4'>
       <div className='flex items-center justify-between'>
-        <Button icon={<PlusOutlined />} type='primary' onClick={() => roleController.current?.openCreate()}>
-          Add new role
-        </Button>
+        <div className='flex items-center justify-between gap-4'>
+          <Button icon={<PlusOutlined />} type='primary' onClick={() => roleController.current?.openCreate()}>
+            Add new role
+          </Button>
+
+          <SortByDropdown
+            ref={sortRef}
+            onChange={handleSortChange}
+            listItems={['date_desc', 'date_asc', 'name_asc', 'name_desc']}
+          />
+        </div>
 
         <SearchInput
           filterKey={entityConfig.filterKeys}
@@ -80,7 +100,7 @@ const RolePage = () => {
         />
       </div>
 
-      <Table rowKey='id' columns={columns} {...tableProps} bordered loading={loading} />
+      <Table rowKey='id' columns={columns} {...tableProps} bordered loading={loading || isFetching} />
       <RoleController form={form} modalSize={500} ref={roleController} onSubmitSuccess={handleSubmitSuccess} />
     </div>
   );

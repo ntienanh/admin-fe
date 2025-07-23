@@ -1,13 +1,20 @@
 import axios from 'axios';
 import type { IRole } from '../interfaces/role';
 
+interface RoleQueryParams {
+  name?: string;
+  description?: string;
+  sortBy?: 'name' | 'description' | 'createdAt';
+  order?: 'asc' | 'desc';
+}
+
 export const RoleServices = {
-  roleQuery: async (params?: { name: string }): Promise<Array<IRole>> => {
-    return await axios.get(`http://localhost:4000/roles`, {
+  roleQuery: async (params?: RoleQueryParams): Promise<Array<IRole>> => {
+    const res = await axios.get(`http://localhost:4000/roles`, {
       params,
     });
+    return res.data;
   },
-
   createRole: async (data: { name: string; description: string }): Promise<Array<IRole>> => {
     return await axios.post(`http://localhost:4000/roles`, data);
   },

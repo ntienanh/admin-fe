@@ -1,5 +1,5 @@
 import { Route, Routes } from 'react-router-dom';
-import RequireRole from '../components/RequireRole';
+import RequireRole from '../contexts/RequireRole';
 import MainLayout from '../layouts/MainLayout';
 import NotFoundPage from '../pages/NotFoundPage';
 import UnauthorizedPage from '../pages/UnauthorizedPage';

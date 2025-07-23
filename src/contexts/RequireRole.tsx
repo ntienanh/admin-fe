@@ -1,5 +1,5 @@
 import { Navigate } from 'react-router-dom';
-import { useAuth, type Role } from '../contexts/AuthContext';
+import { useAuth, type Role } from './AuthContext';
 
 const RequireRole = ({ allowed, children }: { allowed: Role[]; children: React.ReactNode }) => {
   const { role } = useAuth();

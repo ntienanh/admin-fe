@@ -1,6 +1,6 @@
 // App.tsx
 import { Suspense, useEffect } from 'react';
-import LoadingScreen from './components/LoadingScreen';
+import LoadingScreen from './components/loading-screen';
 import { AuthProvider } from './contexts/AuthContext';
 import { AppRouter } from './routes/appRouters';
 
