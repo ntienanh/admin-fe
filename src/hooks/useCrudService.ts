@@ -1,41 +1,85 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { notification } from 'antd';
+import type { ApiResponse } from '../interfaces/api';
 
-export const useCrudService = <T>(
-  service: {
-    create: (data: any) => Promise<any>;
-    update: (data: any) => Promise<any>;
-    delete: (id: string | number) => Promise<any>;
-  },
-  queryKey: string[],
-) => {
+interface UseCRUDServicesOptions<T> {
+  queryKey: string;
+  createFn: (data: Omit<T, 'id'>) => Promise<ApiResponse<T>>;
+  updateFn: (data: T) => Promise<ApiResponse<T>>;
+  deleteFn: (id: string) => Promise<ApiResponse<T>>;
+  messages?: {
+    createSuccess?: string;
+    createError?: string;
+    updateSuccess?: string;
+    updateError?: string;
+    deleteSuccess?: string;
+    deleteError?: string;
+  };
+  logics?: {
+    createSuccess?: (data: T) => void;
+    createError?: (error: unknown) => void;
+    updateSuccess?: (data: T) => void;
+    updateError?: (error: unknown) => void;
+    deleteSuccess?: (id: string) => void;
+    deleteError?: (error: unknown) => void;
+  };
+}
+
+export const useCRUDServices = <T>(options: UseCRUDServicesOptions<T>) => {
   const queryClient = useQueryClient();
+  const { queryKey, createFn, updateFn, deleteFn, messages = {}, logics = {} } = options;
+
+  const {
+    createSuccess: createSuccessMsg = 'Create success!',
+    createError: createErrorMsg = 'Create failed!',
+    updateSuccess: updateSuccessMsg = 'Update success!',
+    updateError: updateErrorMsg = 'Update failed!',
+    deleteSuccess: deleteSuccessMsg = 'Delete success!',
+    deleteError: deleteErrorMsg = 'Delete failed!',
+  } = messages;
 
   const createMutation = useMutation({
-    mutationFn: service.create,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey });
-      notification.success({ message: 'Create success' });
+    mutationFn: createFn,
+    onSuccess: (res: any) => {
+      queryClient.invalidateQueries({ queryKey: [queryKey] });
+      notification.success({ message: createSuccessMsg });
+      logics.createSuccess?.(res.data);
+    },
+    onError: error => {
+      notification.error({ message: createErrorMsg });
+      logics.createError?.(error);
     },
   });
 
   const updateMutation = useMutation({
-    mutationFn: service.update,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey });
-      notification.success({ message: 'Update success' });
+    mutationFn: updateFn,
+    onSuccess: (res: any) => {
+      queryClient.invalidateQueries({ queryKey: [queryKey] });
+      notification.success({ message: updateSuccessMsg });
+      logics.updateSuccess?.(res.data);
+    },
+    onError: error => {
+      notification.error({ message: updateErrorMsg });
+      logics.updateError?.(error);
     },
   });
 
   const deleteMutation = useMutation({
-    mutationFn: service.delete,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey });
-      notification.success({ message: 'Delete success' });
+    mutationFn: deleteFn,
+    onSuccess: (_res, id) => {
+      queryClient.invalidateQueries({ queryKey: [queryKey] });
+      notification.success({ message: deleteSuccessMsg });
+      logics.deleteSuccess?.(id);
+    },
+    onError: error => {
+      notification.error({ message: deleteErrorMsg });
+      logics.deleteError?.(error);
     },
   });
 
-  return { createMutation, updateMutation, deleteMutation };
+  return {
+    createMutation,
+    updateMutation,
+    deleteMutation,
+  };
 };
-
-// const { createMutation, updateMutation, deleteMutation } = useCrudService<IRole>(RoleServices, ['roles']);

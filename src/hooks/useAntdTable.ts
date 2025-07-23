@@ -2,12 +2,8 @@ import { useQuery, type QueryKey } from '@tanstack/react-query';
 import type { TablePaginationConfig, TableProps } from 'antd';
 import type { FilterValue, SorterResult } from 'antd/es/table/interface';
 import { useCallback, useMemo, useState } from 'react';
+import type { ApiResponse } from '../interfaces/api';
 import { cleanObject } from '../utils/common';
-
-export interface ApiResponse<T> {
-  data: T[];
-  total: number;
-}
 
 export interface UseAntdTableProps<T> {
   queryKey: QueryKey;

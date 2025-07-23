@@ -3,8 +3,13 @@ import dayjs from 'dayjs';
 import type { IRole } from '../interfaces/role';
 
 export interface EntityConfig<T> {
-  columns: ColumnsType<T>;
-  filterKeys: (keyof T)[];
+  columns: ColumnsType<T>; // for table
+  filterKeys: (keyof T)[]; // for search input
+}
+
+export enum EntityKey {
+  Roles = 'roles',
+  Users = 'users',
 }
 
 export const EntityConfigs: {

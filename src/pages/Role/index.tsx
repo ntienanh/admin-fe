@@ -5,22 +5,36 @@ import { useRef } from 'react';
 import DeleteConfirm from '../../components/delete-confirm';
 import SearchInput from '../../components/search-input';
 import SortByDropdown from '../../components/sort-by';
-import { EntityConfigs } from '../../config/entities';
-import { useRoleServices } from '../../hooks/features/useRoleServices';
+import { EntityConfigs, EntityKey } from '../../config/entities';
 import { useAntdTable } from '../../hooks/useAntdTable';
+import { useCRUDServices } from '../../hooks/useCrudService';
 import type { IRole } from '../../interfaces/role';
 import { RoleServices } from '../../services/role';
 import RoleController, { type I_RoleController } from './controller';
 
 const RolePage = () => {
   const [form] = Form.useForm();
-  const entityConfig = EntityConfigs['roles'];
+  const entityConfig = EntityConfigs[EntityKey.Roles];
   const roleController = useRef<I_RoleController>(null);
-  const { createMutation, deleteMutation, editMutation } = useRoleServices();
-
   const { tableProps, onChangeSearchInput, loading, isFetching, onChangeSort } = useAntdTable<IRole>({
-    queryKey: ['roles'],
+    queryKey: [EntityKey.Roles],
     apiFn: RoleServices.roleQuery,
+  });
+
+  // const { createMutation, deleteMutation, editMutation } = useRoleServices();
+  const { createMutation, updateMutation, deleteMutation } = useCRUDServices<IRole>({
+    queryKey: EntityKey.Roles,
+    createFn: RoleServices.createRole,
+    updateFn: RoleServices.updateRole,
+    deleteFn: RoleServices.deleteRole,
+    messages: {
+      createSuccess: 'Tạo vai trò thành công!',
+      updateSuccess: 'Cập nhật vai trò thành công!',
+      deleteSuccess: 'Xoá vai trò thành công!',
+      createError: 'Tạo vai trò thất bại!',
+      updateError: 'Cập nhật vai trò thất bại!',
+      deleteError: 'Xoá vai trò thất bại!',
+    },
   });
 
   const columns: ColumnsType<IRole> = [
@@ -60,7 +74,7 @@ const RolePage = () => {
     if (!values.id) {
       createMutation.mutate({ name: values.name, description: values.description });
     } else {
-      editMutation.mutate(values);
+      updateMutation.mutate(values);
     }
 
     form.resetFields();
