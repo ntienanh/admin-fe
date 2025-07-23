@@ -1,63 +1,91 @@
 import { DownOutlined } from '@ant-design/icons';
-import { Button, Dropdown } from 'antd';
+import { Button, Dropdown, Space } from 'antd';
 import { forwardRef, useImperativeHandle, useState } from 'react';
-
-type SortKey = 'name_asc' | 'name_desc' | 'date_asc' | 'date_desc' | 'price_asc' | 'price_desc';
-
-const SORT_MAP: Record<SortKey, string> = {
-  name_asc: 'A - Z',
-  name_desc: 'Z - A',
-  date_asc: 'Oldest',
-  date_desc: 'Newest',
-  price_asc: 'Price Low to High',
-  price_desc: 'Price High to Low',
-};
+import { FIELD_LABELS, ORDER_LABELS, type SortField, type SortKey, type SortOrder } from './interface';
 
 interface IProps {
-  listItems?: SortKey[];
-  onChange?: (key: SortKey) => void;
+  onChange?: (key: SortKey | null) => void;
+  sortFields?: SortField[];
 }
 
 export interface SortByDropdownRef {
   getSelected: () => SortKey | null;
-  setSelected: (key: SortKey) => void;
+  setSelected: (key: SortKey | null) => void;
 }
 
-const defaultListItems: SortKey[] = ['name_asc', 'name_desc', 'date_desc', 'date_asc', 'price_asc', 'price_desc'];
+const defaultSortFields: SortField[] = ['name', 'createdAt', 'updatedAt'];
 
-const SortByDropdown = forwardRef<SortByDropdownRef, IProps>(({ listItems = defaultListItems, onChange }, ref) => {
-  const [selectedKey, setSelectedKey] = useState<SortKey | null>('date_desc');
+const SortByDropdown = forwardRef<SortByDropdownRef, IProps>(({ onChange, sortFields = defaultSortFields }, ref) => {
+  const [field, setField] = useState<SortField | null>(null);
+  const [order, setOrder] = useState<SortOrder | null>(null);
+
+  const currentKey: SortKey | null = field && order ? `${field}_${order}` : null;
 
   useImperativeHandle(ref, () => ({
-    getSelected: () => selectedKey,
-    setSelected: (key: SortKey) => setSelectedKey(key),
+    getSelected: () => currentKey,
+    setSelected: (key: SortKey | null) => {
+      if (!key) {
+        setField(null);
+        setOrder(null);
+        return;
+      }
+      const [f, o] = key.split('_') as [SortField, SortOrder];
+      setField(f);
+      setOrder(o);
+    },
   }));
 
-  const selectedLabel = selectedKey ? SORT_MAP[selectedKey] : 'Select';
+  const handleFieldChange = (key: string) => {
+    const newField = key as SortField;
+    setField(newField);
+    if (order) {
+      onChange?.(`${newField}_${order}`);
+    }
+  };
+
+  const handleOrderChange = (key: string) => {
+    const newOrder = key as SortOrder;
+    setOrder(newOrder);
+    if (field) {
+      onChange?.(`${field}_${newOrder}`);
+    }
+  };
 
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+    <Space>
       <span>Sort by:</span>
       <Dropdown
+        trigger={['click']}
         menu={{
-          selectedKeys: selectedKey ? [selectedKey] : [],
-          onClick: ({ key }) => {
-            const sortKey = key as SortKey;
-            setSelectedKey(sortKey);
-            onChange?.(sortKey);
-          },
-          items: listItems.map(key => ({
-            key,
-            label: SORT_MAP[key],
+          selectedKeys: field ? [field] : [],
+          onClick: ({ key }) => handleFieldChange(key),
+          items: sortFields.map(f => ({
+            key: f,
+            label: FIELD_LABELS[f],
           })),
         }}
-        trigger={['click']}
       >
         <Button>
-          {selectedLabel} <DownOutlined />
+          {field ? FIELD_LABELS[field] : 'Select Field'} <DownOutlined />
         </Button>
       </Dropdown>
-    </div>
+
+      <Dropdown
+        trigger={['click']}
+        menu={{
+          selectedKeys: order ? [order] : [],
+          onClick: ({ key }) => handleOrderChange(key),
+          items: (['asc', 'desc'] as SortOrder[]).map(o => ({
+            key: o,
+            label: ORDER_LABELS[o],
+          })),
+        }}
+      >
+        <Button>
+          {order ? ORDER_LABELS[order] : 'Select Order'} <DownOutlined />
+        </Button>
+      </Dropdown>
+    </Space>
   );
 });
 

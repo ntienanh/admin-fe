@@ -68,7 +68,8 @@ const RolePage = () => {
     roleController.current?.close();
   };
 
-  const handleSortChange = (key: string) => {
+  const handleSortChange = (key: string | any) => {
+    console.log('handleSortChange key', key);
     const [field, order] = key.split('_');
 
     setSearchInputFilters(prev => ({
@@ -81,23 +82,19 @@ const RolePage = () => {
   return (
     <div className='flex flex-col gap-4'>
       <div className='flex items-center justify-between'>
-        <div className='flex items-center justify-between gap-4'>
-          <Button icon={<PlusOutlined />} type='primary' onClick={() => roleController.current?.openCreate()}>
-            Add new role
-          </Button>
+        <Button icon={<PlusOutlined />} type='primary' onClick={() => roleController.current?.openCreate()}>
+          Add new role
+        </Button>
 
-          <SortByDropdown
-            ref={sortRef}
-            onChange={handleSortChange}
-            listItems={['date_desc', 'date_asc', 'name_asc', 'name_desc']}
+        <div className='flex items-center justify-between gap-4'>
+          <SortByDropdown ref={sortRef} sortFields={['name', 'createdAt', 'updatedAt']} onChange={handleSortChange} />
+
+          <SearchInput
+            filterKey={entityConfig.filterKeys}
+            onSearch={setSearchInputFilters}
+            placeholder='Search by name'
           />
         </div>
-
-        <SearchInput
-          filterKey={entityConfig.filterKeys}
-          onSearch={setSearchInputFilters}
-          placeholder='Search by name'
-        />
       </div>
 
       <Table rowKey='id' columns={columns} {...tableProps} bordered loading={loading || isFetching} />
