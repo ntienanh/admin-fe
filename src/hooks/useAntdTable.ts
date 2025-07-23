@@ -33,7 +33,6 @@ export function useAntdTable<T>({
   const [filters, setFilters] = useState<Record<string, FilterValue | null>>({});
   const [searchInputFilters, setSearchInputFilters] = useState<Record<string, any>>({});
 
-  // ⚠️ Memo hóa defaultParams nếu từ ngoài vào không ổn định
   const stableDefaultParams = useMemo(() => defaultParams, []);
 
   const params = useMemo(() => {
@@ -57,6 +56,7 @@ export function useAntdTable<T>({
     staleTime,
   });
 
+  // Table change
   const handleTableChange: TableProps<T>['onChange'] = useCallback(
     (
       newPagination: TablePaginationConfig,
@@ -77,6 +77,7 @@ export function useAntdTable<T>({
     [],
   );
 
+  // Search Input
   const handleSearchInputFilters = useCallback(
     (newFilters: Record<string, any> | ((prev: Record<string, any>) => Record<string, any>)) => {
       setSearchInputFilters(prev =>
@@ -91,12 +92,24 @@ export function useAntdTable<T>({
     [],
   );
 
+  // Sort by
+  const handleSortChange = (key: string | any) => {
+    const [field, order] = key.split('_');
+
+    handleSearchInputFilters(prev => ({
+      ...prev,
+      sortBy: field,
+      order,
+    }));
+  };
+
   return {
     data: data?.data ?? [],
     total: data?.total ?? 0,
     loading: isLoading || isFetching,
     refetch,
-    setSearchInputFilters: handleSearchInputFilters,
+    onChangeSearchInput: handleSearchInputFilters,
+    onChangeSort: handleSortChange,
     setPagination,
     isFetching,
     tableProps: {

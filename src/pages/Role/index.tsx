@@ -4,7 +4,7 @@ import type { ColumnsType } from 'antd/es/table';
 import { useRef } from 'react';
 import DeleteConfirm from '../../components/delete-confirm';
 import SearchInput from '../../components/search-input';
-import SortByDropdown, { type SortByDropdownRef } from '../../components/sort-by';
+import SortByDropdown from '../../components/sort-by';
 import { EntityConfigs } from '../../config/entities';
 import { useRoleServices } from '../../hooks/features/useRoleServices';
 import { useAntdTable } from '../../hooks/useAntdTable';
@@ -13,13 +13,12 @@ import { RoleServices } from '../../services/role';
 import RoleController, { type I_RoleController } from './controller';
 
 const RolePage = () => {
-  const sortRef = useRef<SortByDropdownRef>(null);
   const [form] = Form.useForm();
   const entityConfig = EntityConfigs['roles'];
   const roleController = useRef<I_RoleController>(null);
   const { createMutation, deleteMutation, editMutation } = useRoleServices();
 
-  const { tableProps, setSearchInputFilters, loading, isFetching } = useAntdTable<IRole>({
+  const { tableProps, onChangeSearchInput, loading, isFetching, onChangeSort } = useAntdTable<IRole>({
     queryKey: ['roles'],
     apiFn: RoleServices.roleQuery,
   });
@@ -68,17 +67,6 @@ const RolePage = () => {
     roleController.current?.close();
   };
 
-  const handleSortChange = (key: string | any) => {
-    console.log('handleSortChange key', key);
-    const [field, order] = key.split('_');
-
-    setSearchInputFilters(prev => ({
-      ...prev,
-      sortBy: field,
-      order,
-    }));
-  };
-
   return (
     <div className='flex flex-col gap-4'>
       <div className='flex items-center justify-between'>
@@ -87,11 +75,11 @@ const RolePage = () => {
         </Button>
 
         <div className='flex items-center justify-between gap-4'>
-          <SortByDropdown ref={sortRef} sortFields={['name', 'createdAt', 'updatedAt']} onChange={handleSortChange} />
+          <SortByDropdown sortFields={['name', 'createdAt', 'updatedAt']} onChange={onChangeSort} />
 
           <SearchInput
             filterKey={entityConfig.filterKeys}
-            onSearch={setSearchInputFilters}
+            onSearch={onChangeSearchInput}
             placeholder='Search by name'
           />
         </div>
