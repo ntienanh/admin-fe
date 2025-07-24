@@ -1,6 +1,7 @@
 import { Route, Routes } from 'react-router-dom';
 import RequireRole from '../contexts/RequireRole';
 import MainLayout from '../layouts/MainLayout';
+import LoginPage from '../pages/Auth/Login';
 import NotFoundPage from '../pages/NotFoundPage';
 import UnauthorizedPage from '../pages/UnauthorizedPage';
 import { adminRoutes } from './adminRoutes';
@@ -14,8 +15,11 @@ export const AppRouter = () => {
         ))}
 
         <Route path='/unauthorized' element={<UnauthorizedPage />} />
-        <Route path='*' element={<NotFoundPage />} />
       </Route>
+
+      <Route path='/login' element={<LoginPage />} />
+      {/* <Route path='/register' element={<RegisterPage />} /> */}
+      <Route path='*' element={<NotFoundPage />} />
     </Routes>
   );
 };

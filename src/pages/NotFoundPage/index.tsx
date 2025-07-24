@@ -1,5 +1,6 @@
 import lottie from 'lottie-web';
 import { useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 
 const NotFoundPage = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -17,8 +18,15 @@ const NotFoundPage = () => {
   }, []);
 
   return (
-    <div className='relative z-50 flex h-full flex-col items-center justify-center bg-white bg-opacity-95'>
-      <div ref={containerRef} className='h-[600px] w-[600px]' />
+    <div className='relative z-50 flex h-screen w-screen flex-col items-center justify-center bg-gradient-to-br from-[#9fb7bb] to-[#ffffff]'>
+      <Link
+        to={'/'}
+        className='absolute z-50 -mt-[23rem] flex items-center gap-2 text-center text-lg font-semibold text-blue-600'
+      >
+        <span>🔙</span>
+        <span>Go back Home</span>
+      </Link>
+      <div ref={containerRef} className='relative z-40 h-[600px] w-[600px]'></div>
     </div>
   );
 };
