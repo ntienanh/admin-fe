@@ -1,7 +1,6 @@
 import { GithubOutlined, GoogleOutlined, LockOutlined, UserOutlined } from '@ant-design/icons';
 import { Button, Card, Checkbox, Divider, Form, Input, Space, Typography } from 'antd';
 import React from 'react';
-import { useAuth } from '../../../contexts/AuthContext';
 
 const { Title, Text, Link } = Typography;
 
@@ -14,7 +13,6 @@ interface LoginPageValues {
 export default function LoginPage() {
   const [form] = Form.useForm();
   const [loading, setLoading] = React.useState(false);
-  const { login } = useAuth();
 
   const onFinish = async (values: LoginPageValues) => {
     setLoading(true);

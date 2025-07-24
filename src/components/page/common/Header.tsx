@@ -1,7 +1,13 @@
-import { BellOutlined, LogoutOutlined, SettingOutlined } from '@ant-design/icons';
-import { Avatar, Badge, Button, Layout, Popover } from 'antd';
+import { BellOutlined, LogoutOutlined, MenuOutlined, SettingOutlined } from '@ant-design/icons';
+import { Avatar, Badge, Button, Drawer, Layout, Popover } from 'antd';
+import { useEffect, useState } from 'react';
+import useMobileScreen from '../../../hooks/useMobileScreen';
 const { Header } = Layout;
-const HeaderMainLayout = () => {
+
+const HeaderMainLayout = ({ children, selectedKeys }: { children: React.ReactNode; selectedKeys: string[] }) => {
+  const { isMobile } = useMobileScreen();
+  const [openDrawer, setOpenDrawer] = useState(false);
+
   const content = (
     <div className='min-w-[200px] text-sm'>
       <div className='px-4 pb-1 pt-2 font-semibold'>{'name'}</div>
@@ -17,26 +23,47 @@ const HeaderMainLayout = () => {
     </div>
   );
 
+  useEffect(() => {
+    setOpenDrawer(false);
+  }, [selectedKeys]);
+
   return (
-    <Header className='sticky top-0 z-40 flex h-16 items-center justify-between bg-gray-100 px-4 shadow-md'>
-      <div></div>
+    <>
+      <Header className='sticky top-0 z-40 flex h-16 items-center justify-between bg-gray-100 px-4 shadow-md'>
+        {/* Left side */}
+        <div className='flex items-center gap-2'>
+          {isMobile && (
+            <Button type='text' icon={<MenuOutlined />} onClick={() => setOpenDrawer(true)} className='text-xl' />
+          )}
+        </div>
 
-      <div className='flex items-center gap-4'>
-        {/* Notification Icon with Red Dot */}
-        <Badge dot offset={[-2, 2]}>
-          <Button shape='circle' icon={<BellOutlined />} style={{ border: 'none' }} className='shadow-md' />
-        </Badge>
+        {/* Right side */}
+        <div className='flex items-center gap-4'>
+          <Badge dot offset={[-2, 2]}>
+            <Button shape='circle' icon={<BellOutlined />} style={{ border: 'none' }} className='shadow-md' />
+          </Badge>
 
-        {/* Avatar with Popover */}
-        <Popover placement='bottomRight' content={content} trigger='click'>
-          <Avatar
-            size='large'
-            src='https://randomuser.me/api/portraits/men/32.jpg'
-            className='cursor-pointer shadow-md'
-          />
-        </Popover>
-      </div>
-    </Header>
+          <Popover placement='bottomRight' content={content} trigger='click'>
+            <Avatar
+              size='large'
+              src='https://randomuser.me/api/portraits/men/32.jpg'
+              className='cursor-pointer shadow-md'
+            />
+          </Popover>
+        </div>
+      </Header>
+
+      {/* Drawer menu for mobile */}
+      <Drawer
+        title='Menu'
+        placement='left'
+        onClose={() => setOpenDrawer(false)}
+        open={openDrawer}
+        styles={{ body: { padding: 0 } }}
+      >
+        {children}
+      </Drawer>
+    </>
   );
 };
 

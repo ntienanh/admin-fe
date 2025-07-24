@@ -21,7 +21,6 @@ const RolePage = () => {
     apiFn: RoleServices.roleQuery,
   });
 
-  // const { createMutation, deleteMutation, editMutation } = useRoleServices();
   const { createMutation, updateMutation, deleteMutation } = useCRUDServices<IRole>({
     queryKey: EntityKey.Roles,
     createFn: RoleServices.createRole,
@@ -43,6 +42,7 @@ const RolePage = () => {
       title: 'Action',
       dataIndex: 'action',
       key: 'action',
+
       render: (_: string, record: IRole) => (
         <div className='flex gap-x-[10px] text-[20px]'>
           <EditOutlined
@@ -83,23 +83,42 @@ const RolePage = () => {
 
   return (
     <div className='flex flex-col gap-4'>
-      <div className='flex items-center justify-between'>
-        <Button icon={<PlusOutlined />} type='primary' onClick={() => roleController.current?.openCreate()}>
-          Add new role
-        </Button>
-
-        <div className='flex items-center justify-between gap-4'>
-          <SortByDropdown sortFields={['name', 'createdAt', 'updatedAt']} onChange={onChangeSort} />
+      <div className='flex flex-col gap-4 md:flex-row md:items-center md:justify-between'>
+        {/* Row 1: Button + SearchInput */}
+        <div className='flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4 md:flex-row md:gap-4'>
+          <Button
+            icon={<PlusOutlined />}
+            type='primary'
+            className='w-full sm:w-auto'
+            onClick={() => roleController.current?.openCreate()}
+          >
+            Add new role
+          </Button>
 
           <SearchInput
             filterKey={entityConfig.filterKeys}
             onSearch={onChangeSearchInput}
             placeholder='Search by name'
+            className='w-full sm:w-[200px]'
           />
         </div>
+
+        {/* Row 2: SortByDropdown */}
+        <SortByDropdown
+          sortFields={['name', 'createdAt', 'updatedAt']}
+          onChange={onChangeSort}
+          className='w-full md:w-auto'
+        />
       </div>
 
-      <Table rowKey='id' columns={columns} {...tableProps} bordered loading={loading || isFetching} />
+      <Table
+        rowKey='id'
+        columns={columns}
+        {...tableProps}
+        bordered
+        loading={loading || isFetching}
+        scroll={{ x: 1000 }}
+      />
       <RoleController form={form} modalSize={500} ref={roleController} onSubmitSuccess={handleSubmitSuccess} />
     </div>
   );

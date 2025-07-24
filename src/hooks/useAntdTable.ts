@@ -1,6 +1,7 @@
 import { useQuery, type QueryKey } from '@tanstack/react-query';
 import type { TablePaginationConfig, TableProps } from 'antd';
 import type { FilterValue, SorterResult } from 'antd/es/table/interface';
+import stringify from 'fast-json-stable-stringify';
 import { useCallback, useMemo, useState } from 'react';
 import type { ApiResponse } from '../interfaces/api';
 import { cleanObject } from '../utils/common';
@@ -31,7 +32,8 @@ export function useAntdTable<T>({
 
   const stableDefaultParams = useMemo(() => defaultParams, []);
 
-  const params = useMemo(() => {
+  // Tạo stableParams
+  const stableParams = useMemo(() => {
     return cleanObject({
       page: pagination.current,
       limit: pagination.pageSize,
@@ -45,9 +47,14 @@ export function useAntdTable<T>({
     });
   }, [pagination, sorter, filters, searchInputFilters, stableDefaultParams]);
 
+  // Tạo queryKey ổn định bằng stringify
+  const queryKeyWithParams = useMemo(() => {
+    return [...queryKey, stringify(stableParams)];
+  }, [queryKey, stableParams]);
+
   const { data, isLoading, isFetching, refetch } = useQuery<ApiResponse<T>>({
-    queryKey: useMemo(() => [...queryKey, params], [queryKey, params]),
-    queryFn: () => apiFn(params),
+    queryKey: queryKeyWithParams,
+    queryFn: () => apiFn(stableParams),
     enabled,
     staleTime,
   });

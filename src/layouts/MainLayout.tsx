@@ -18,6 +18,7 @@ import clsx from 'clsx';
 import React, { useEffect, useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import HeaderMainLayout from '../components/page/common/Header';
+import useMobileScreen from '../hooks/useMobileScreen';
 
 const { Sider } = Layout;
 
@@ -74,6 +75,9 @@ const MainLayout: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
   const location = useLocation();
+  const { isMobile } = useMobileScreen();
+
+  console.log('selectedKeys', selectedKeys);
 
   useEffect(() => {
     // Xác định menu nào nên mở dựa trên path
@@ -101,54 +105,52 @@ const MainLayout: React.FC = () => {
 
   const sidebarWidth = collapsed ? 80 : 240;
 
+  const renderMenu = () => (
+    <Menu
+      onOpenChange={handleOpenChange}
+      theme='light'
+      mode='inline'
+      openKeys={openKeys}
+      selectedKeys={selectedKeys}
+      items={items}
+      className='mt-2'
+    />
+  );
+
   return (
     <div className='flex h-screen w-screen overflow-hidden'>
       {/* Sider */}
-      <Sider
-        width={240}
-        collapsedWidth={80}
-        collapsible
-        collapsed={collapsed}
-        onCollapse={setCollapsed}
-        className='fixed left-0 top-0 z-50 h-full overflow-y-auto border-r bg-white transition-all !duration-200 ease-in-out'
-        trigger={
-          <div className='flex h-12 items-center justify-center !bg-[#E2273950] hover:bg-gray-200'>
-            {collapsed ? <RightOutlined /> : <LeftOutlined />}
-          </div>
-        }
-      >
-        {/* Logo */}
-        <div
-          className={clsx(
-            'flex h-16 w-full items-center justify-center border-r bg-gray-100 shadow-md',
-            collapsed && 'px-1',
-          )}
+      {!isMobile && (
+        <Sider
+          width={240}
+          collapsedWidth={80}
+          collapsible
+          collapsed={collapsed}
+          onCollapse={setCollapsed}
+          className='fixed left-0 top-0 z-50 h-full overflow-y-auto border-r bg-white transition-all !duration-200 ease-in-out'
+          trigger={
+            <div className='flex h-12 items-center justify-center !bg-[#1677FF98] hover:bg-gray-200'>
+              {collapsed ? <RightOutlined /> : <LeftOutlined />}
+            </div>
+          }
         >
-          <img src='https://pbs.twimg.com/media/CyGXXiZWEAEznfZ.png' alt='logo' className='h-12 object-contain' />
-        </div>
-
-        <Menu
-          onOpenChange={handleOpenChange}
-          theme='light'
-          mode='inline'
-          openKeys={openKeys}
-          selectedKeys={selectedKeys}
-          defaultSelectedKeys={['1']}
-          items={items}
-          className='mt-2'
-        />
-      </Sider>
+          <div className={clsx('flex h-16 items-center justify-center border-b bg-gray-100', collapsed && 'px-1')}>
+            <img src='https://pbs.twimg.com/media/CyGXXiZWEAEznfZ.png' alt='logo' className='h-12 object-contain' />
+          </div>
+          {renderMenu()}
+        </Sider>
+      )}
 
       {/* Main Content Area */}
       <div
         className='flex h-full flex-col transition-[margin,width] duration-200 ease-in-out'
         style={{
-          marginLeft: sidebarWidth,
-          width: `calc(100vw - ${sidebarWidth}px)`,
+          marginLeft: isMobile ? 0 : sidebarWidth,
+          width: isMobile ? '100vw' : `calc(100vw - ${sidebarWidth}px)`,
         }}
       >
         {/* Fixed Header */}
-        <HeaderMainLayout />
+        <HeaderMainLayout children={renderMenu()} selectedKeys={selectedKeys} />
 
         {/* Scrollable Content */}
         <div className='flex-1 overflow-y-auto overflow-x-hidden bg-white p-5'>
