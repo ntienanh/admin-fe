@@ -1,5 +1,6 @@
 import {
   AppstoreOutlined,
+  AreaChartOutlined,
   AuditOutlined,
   ContainerOutlined,
   DashboardOutlined,
@@ -7,7 +8,9 @@ import {
   DollarOutlined,
   LeftOutlined,
   MailOutlined,
+  OrderedListOutlined,
   RightOutlined,
+  ShopOutlined,
   TeamOutlined,
   UsergroupAddOutlined,
   UserSwitchOutlined,
@@ -28,12 +31,22 @@ const items: MenuItem[] = [
   { key: '/', icon: <DashboardOutlined />, label: <Link to='/'>Dashboard</Link> },
 
   {
-    key: '/user',
+    key: 'user',
     icon: <TeamOutlined />,
     label: 'Users',
     children: [
       { key: '/staff', label: <Link to='/staff'>Staff</Link>, icon: <UsergroupAddOutlined /> },
       { key: '/role', label: <Link to='/role'>Role</Link>, icon: <UserSwitchOutlined /> },
+    ],
+  },
+  {
+    key: 'store',
+    label: 'Store',
+    icon: <AppstoreOutlined />,
+    children: [
+      { key: '11', label: 'Shops', icon: <ShopOutlined /> },
+      { key: '10', label: 'Report', icon: <AreaChartOutlined /> },
+      { key: '9', label: 'Activity Logs', icon: <OrderedListOutlined /> },
     ],
   },
   { key: '/product2', icon: <DesktopOutlined />, label: <Link to='/product'>Product</Link> },
@@ -50,15 +63,7 @@ const items: MenuItem[] = [
       { key: '8', label: 'Option 8' },
     ],
   },
-  {
-    key: 'sub2',
-    label: 'Store',
-    icon: <AppstoreOutlined />,
-    children: [
-      { key: '9', label: 'History', icon: <DesktopOutlined /> },
-      { key: '10', label: 'Revenue', icon: <DollarOutlined /> },
-    ],
-  },
+
   {
     key: 'admin',
     label: 'Administration',
