@@ -8,53 +8,53 @@ import SortByDropdown from '../../components/sort-by';
 import { EntityConfigs, EntityKey } from '../../config/entities';
 import { useAntdTable } from '../../hooks/useAntdTable';
 import { useCRUDServices } from '../../hooks/useCrudService';
-import type { IRole } from '../../interfaces/role';
-import { RoleServices } from '../../services/role';
-import RoleController, { type I_RoleController } from './controller';
+import type { CreateStaffDto, IStaff, UpdateStaffDto } from '../../interfaces/staff';
+import { StaffServices } from '../../services/staff';
+import StaffController, { type I_StaffController } from './controller';
 
-const RolePage = () => {
+const StaffPage = () => {
   const [form] = Form.useForm();
-  const entityConfig = EntityConfigs[EntityKey.Roles];
-  const roleController = useRef<I_RoleController>(null);
-  const { tableProps, onChangeSearchInput, loading, isFetching, onChangeSort } = useAntdTable<IRole>({
-    queryKey: [EntityKey.Roles],
-    apiFn: RoleServices.roleQuery,
+  const entityConfig = EntityConfigs[EntityKey.Staff];
+  const staffController = useRef<I_StaffController>(null);
+  const { tableProps, onChangeSearchInput, loading, isFetching, onChangeSort } = useAntdTable<IStaff>({
+    queryKey: [EntityKey.Staff],
+    apiFn: StaffServices.staffQuery,
   });
 
-  const { createMutation, updateMutation, deleteMutation } = useCRUDServices<IRole, Omit<IRole, 'id'>, IRole>({
-    queryKey: EntityKey.Roles,
-    createFn: RoleServices.createRole,
-    updateFn: RoleServices.updateRole,
-    deleteFn: RoleServices.deleteRole,
+  const { createMutation, updateMutation, deleteMutation } = useCRUDServices<IStaff, CreateStaffDto, UpdateStaffDto>({
+    queryKey: EntityKey.Staff,
+    createFn: StaffServices.createStaff,
+    updateFn: StaffServices.updateStaff,
+    deleteFn: StaffServices.deleteStaff,
     messages: {
-      createSuccess: 'Tạo vai trò thành công!',
-      updateSuccess: 'Cập nhật vai trò thành công!',
-      deleteSuccess: 'Xoá vai trò thành công!',
-      createError: 'Tạo vai trò thất bại!',
-      updateError: 'Cập nhật vai trò thất bại!',
-      deleteError: 'Xoá vai trò thất bại!',
+      createSuccess: 'Create staff successfully',
+      updateSuccess: 'Update staff successfully',
+      deleteSuccess: 'Delete staff successfully',
+      createError: 'Create staff failed',
+      updateError: 'Update staff failed',
+      deleteError: 'Delete staff failed',
     },
   });
 
-  const columns: ColumnsType<IRole> = [
+  const columns: ColumnsType<IStaff> = [
     ...entityConfig.columns,
     {
       title: 'Action',
       dataIndex: 'action',
       key: 'action',
 
-      render: (_: string, record: IRole) => (
+      render: (_: string, record: IStaff) => (
         <div className='flex gap-x-[10px] text-[20px]'>
           <EditOutlined
             style={{ color: '#4E89FF' }}
             onClick={() => {
-              roleController.current?.openDetail(record.id.toString(), true, record);
+              staffController.current?.openDetail(record.id.toString(), true, record);
             }}
           />
           <InfoCircleOutlined
             style={{ color: '#4E89FF' }}
             onClick={() => {
-              roleController.current?.openDetail(record.id.toString(), false, record);
+              staffController.current?.openDetail(record.id.toString(), false, record);
             }}
           />
           <DeleteConfirm
@@ -69,16 +69,17 @@ const RolePage = () => {
   ];
 
   const handleSubmitSuccess = () => {
-    const values: IRole = form.getFieldsValue();
+    const values: IStaff = form.getFieldsValue();
+    console.log('Submitting values:', values);
 
     if (!values.id) {
-      createMutation.mutate({ name: values.name, description: values.description });
+      createMutation.mutate({ email: values.email, name: values.name, password: values.password });
     } else {
-      updateMutation.mutate(values);
+      updateMutation.mutate({ id: values.id, email: values.email, name: values.name });
     }
 
     form.resetFields();
-    roleController.current?.close();
+    staffController.current?.close();
   };
 
   return (
@@ -90,9 +91,9 @@ const RolePage = () => {
             icon={<PlusOutlined />}
             type='primary'
             className='w-full sm:w-auto'
-            onClick={() => roleController.current?.openCreate()}
+            onClick={() => staffController.current?.openCreate()}
           >
-            Add new role
+            Add new staff
           </Button>
 
           <SearchInput
@@ -119,9 +120,10 @@ const RolePage = () => {
         loading={loading || isFetching}
         scroll={{ x: 1000 }}
       />
-      <RoleController form={form} modalSize={500} ref={roleController} onSubmitSuccess={handleSubmitSuccess} />
+
+      <StaffController form={form} modalSize={500} ref={staffController} onSubmitSuccess={handleSubmitSuccess} />
     </div>
   );
 };
 
-export default RolePage;
+export default StaffPage;

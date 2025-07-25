@@ -1,6 +1,7 @@
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
 import type { IRole } from '../interfaces/role';
+import type { IStaff } from '../interfaces/staff';
 
 export interface EntityConfig<T> {
   columns: ColumnsType<T>; // for table
@@ -9,12 +10,12 @@ export interface EntityConfig<T> {
 
 export enum EntityKey {
   Roles = 'roles',
-  Users = 'users',
+  Staff = 'staff',
 }
 
 export const EntityConfigs: {
   roles: EntityConfig<IRole>;
-  users: EntityConfig<any>;
+  staff: EntityConfig<IStaff>;
 } = {
   roles: {
     columns: [
@@ -25,11 +26,13 @@ export const EntityConfigs: {
     ],
     filterKeys: ['name', 'description'],
   },
-  users: {
+  staff: {
     columns: [
-      { title: 'Username', dataIndex: 'username' },
+      { title: 'Username', dataIndex: 'name' },
       { title: 'Email', dataIndex: 'email' },
+      { title: 'Provider', dataIndex: 'provider', render: (text: string) => text || 'Account' },
+      { title: 'Avatar', dataIndex: 'avatar', render: (text: string) => text || '-', align: 'center' },
     ],
-    filterKeys: ['username', 'email'],
+    filterKeys: ['name'],
   },
 };

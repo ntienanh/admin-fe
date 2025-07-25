@@ -1,7 +1,7 @@
 import type { ModalProps } from 'antd';
 import { Button, Form, Input, Modal } from 'antd';
 import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
-import type { IRole } from '../../../interfaces/role';
+import type { IStaff } from '../../../interfaces/staff';
 
 interface I_Props extends ModalProps {
   onSubmitSuccess?: () => void;
@@ -9,17 +9,17 @@ interface I_Props extends ModalProps {
   form: any;
 }
 
-export interface I_RoleController {
-  openDetail: (id: string, editable: boolean, data?: IRole) => void;
+export interface I_StaffController {
+  openDetail: (id: string, editable: boolean, data?: IStaff) => void;
   openCreate: () => void;
   close: () => void;
 }
 
-const RoleController = forwardRef<I_RoleController, I_Props>((props, ref) => {
+const StaffController = forwardRef<I_StaffController, I_Props>((props, ref) => {
   const { form, onSubmitSuccess, modalSize, ...restModalProps } = props;
   const [isOpen, setOpen] = useState(false);
   const [editable, setEditable] = useState<boolean>(false);
-  const roleId = useRef<string>('');
+  const staffId = useRef<string>('');
 
   const openCreate = () => {
     setOpen(true);
@@ -27,12 +27,12 @@ const RoleController = forwardRef<I_RoleController, I_Props>((props, ref) => {
     form.resetFields();
   };
 
-  const openDetail = (id: string, canEdit: boolean, data?: IRole) => {
+  const openDetail = (id: string, canEdit: boolean, data?: IStaff) => {
     console.log('data', data);
 
     setOpen(true);
     setEditable(canEdit);
-    roleId.current = id;
+    staffId.current = id;
 
     form.setFieldsValue({ ...data });
   };
@@ -40,7 +40,7 @@ const RoleController = forwardRef<I_RoleController, I_Props>((props, ref) => {
   const close = () => {
     setOpen(false);
     form.resetFields();
-    roleId.current = '';
+    staffId.current = '';
   };
 
   useImperativeHandle(ref, () => ({ openDetail, openCreate, close }), []);
@@ -52,12 +52,13 @@ const RoleController = forwardRef<I_RoleController, I_Props>((props, ref) => {
       open={isOpen}
       onCancel={close}
       width={modalSize}
-      title={!roleId.current ? 'Create Role' : editable ? 'Edit Role' : 'View Role'}
+      title={!staffId.current ? 'Create Staff' : editable ? 'Edit Staff' : 'View Staff'}
       footer={null}
     >
       <Form
         form={form}
         layout='vertical'
+        initialValues={{ password: 'password@123' }}
         onFinish={() => {
           onSubmitSuccess?.();
           close();
@@ -67,12 +68,28 @@ const RoleController = forwardRef<I_RoleController, I_Props>((props, ref) => {
           <Input type='hidden' />
         </Form.Item>
 
-        <Form.Item label='Role Name' name='name' rules={[{ required: true, message: 'Please input the role name!' }]}>
-          <Input disabled={!editable} placeholder='Enter role name' />
+        <Form.Item label='Username' name='name' rules={[{ required: true, message: 'Please enter username' }]}>
+          <Input placeholder='Enter username' />
         </Form.Item>
 
-        <Form.Item label='Description' name='description'>
-          <Input.TextArea disabled={!editable} placeholder='Enter description' />
+        <Form.Item
+          hidden
+          label='Password'
+          name='password'
+          rules={[{ required: true, message: 'Please enter password' }]}
+        >
+          <Input.Password placeholder='Enter password' />
+        </Form.Item>
+
+        <Form.Item
+          label='Email'
+          name='email'
+          rules={[
+            { type: 'email', message: 'Invalid email' },
+            { required: true, message: 'Please enter email' },
+          ]}
+        >
+          <Input placeholder='Enter email' />
         </Form.Item>
 
         {editable && (
@@ -90,4 +107,4 @@ const RoleController = forwardRef<I_RoleController, I_Props>((props, ref) => {
   );
 });
 
-export default RoleController;
+export default StaffController;

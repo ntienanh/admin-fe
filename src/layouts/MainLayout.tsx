@@ -77,8 +77,6 @@ const MainLayout: React.FC = () => {
   const location = useLocation();
   const { isMobile } = useMobileScreen();
 
-  console.log('selectedKeys', selectedKeys);
-
   useEffect(() => {
     // Xác định menu nào nên mở dựa trên path
     const path = location.pathname;

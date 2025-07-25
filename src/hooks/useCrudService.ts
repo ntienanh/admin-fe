@@ -2,10 +2,10 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { notification } from 'antd';
 import type { ApiResponse } from '../interfaces/api';
 
-interface UseCRUDServicesOptions<T> {
+interface UseCRUDServicesOptions<T, CreateDto, UpdateDto> {
   queryKey: string;
-  createFn: (data: Omit<T, 'id'>) => Promise<ApiResponse<T>>;
-  updateFn: (data: T) => Promise<ApiResponse<T>>;
+  createFn: (data: CreateDto) => Promise<ApiResponse<T>>;
+  updateFn: (data: UpdateDto) => Promise<ApiResponse<T>>;
   deleteFn: (id: string) => Promise<ApiResponse<T>>;
   messages?: {
     createSuccess?: string;
@@ -25,7 +25,7 @@ interface UseCRUDServicesOptions<T> {
   };
 }
 
-export const useCRUDServices = <T>(options: UseCRUDServicesOptions<T>) => {
+export const useCRUDServices = <T, CreateDto, UpdateDto>(options: UseCRUDServicesOptions<T, CreateDto, UpdateDto>) => {
   const queryClient = useQueryClient();
   const { queryKey, createFn, updateFn, deleteFn, messages = {}, logics = {} } = options;
 

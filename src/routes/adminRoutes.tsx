@@ -6,6 +6,7 @@ import type { Role } from '../contexts/AuthContext';
 const Dashboard = lazy(() => import('../pages/Dashboard'));
 const RolePage = lazy(() => import('../pages/Role'));
 const Product = lazy(() => import('../pages/Product'));
+const StaffPage = lazy(() => import('../pages/Staff'));
 
 export interface AppRoute {
   path: string;
@@ -27,6 +28,11 @@ export const adminRoutes: AppRoute[] = [
   {
     path: '/role',
     element: <RolePage />,
+    allowedRoles: ['admin'],
+  },
+  {
+    path: '/staff',
+    element: <StaffPage />,
     allowedRoles: ['admin'],
   },
 ];
